@@ -5,9 +5,9 @@ int main() {
     char Str[20];
    
     printf("Enter a String (without any spaces) : ");
-    scanf("%s", &Str);
+    scanf("%s", &Str[0]);
    
-    char* ptr = &Str;
+    char* ptr = &Str[0];
     int Counter=0;
    
     while(*ptr!='\0'){
