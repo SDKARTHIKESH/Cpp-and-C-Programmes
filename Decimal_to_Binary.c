@@ -16,7 +16,8 @@ int main(){
 
 void Binary(int Num){
 
-    int Max_Power = pow(2, log2(Num));
+    int Var=log2(Num);
+    int Max_Power = pow(2, Var);
 
     while(Num!=0 || Max_Power!=0){
 
