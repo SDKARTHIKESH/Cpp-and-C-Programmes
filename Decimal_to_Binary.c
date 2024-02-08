@@ -6,7 +6,11 @@ void Binary(int Num);
 int main(){
 
     int Number;
+
+    printf("Enter the Number to Convert to Binary : ");
     scanf("%d", &Number);
+
+    printf("\n");
 
     Binary(Number);
 
@@ -32,5 +36,9 @@ void Binary(int Num){
         Max_Power/=2;
 
     }
+
+    printf("\n");
+
+    return;
 
 }
