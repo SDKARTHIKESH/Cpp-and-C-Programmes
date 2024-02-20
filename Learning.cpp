@@ -1,16 +1,4 @@
-#include <iostream>
-
-
-using namespace std;
-
-enum Hello {HIGH, LOW, MED };
-
-
-int main() {
-
-	Hello hi = HIGH;
-
-	cout << hi;
+int main(){
 
 	return 0;
 
