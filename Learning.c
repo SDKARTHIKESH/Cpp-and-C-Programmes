@@ -6,17 +6,20 @@
 int main() 
 {
 
-    /* Enter your code here. Read input from STDIN. Print output to STDOUT */    
-    
-    char Ch, Str1[100], Str2[100];
-    
-    scanf("%c", &Ch);
-    scanf("%s", &Str1[0]);
-    scanf("%[^\n]%*c", &Str2[0]);
-    
-    printf("%c\n", Ch);
-    printf("%s\n", Str1);
-    printf("%s\n", Str2);
-    
+    union Hello {
+
+        float a;
+        int b;
+
+    };
+
+    union Hello* Arr = (union Hello*)malloc(5 * sizeof(union Hello));
+
+    //scanf("%f", &(Arr->a));
+    //scanf("%d", &(Arr->b));
+
+    printf("%f\n", Arr->a);
+    printf("%d\n", Arr->b);
+
     return 0;
 }

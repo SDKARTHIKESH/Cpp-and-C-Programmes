@@ -1,5 +1,21 @@
+#include <iostream>
+
+using namespace std;
+
+class Hello{
+
+	public:
+
+	Hello(){
+
+		cout << "Hello\n";
+
+	}
+
+};
+
 int main(){
 
-	return 0;
+	cout << ("Hello"!="Hello");
 
 }
