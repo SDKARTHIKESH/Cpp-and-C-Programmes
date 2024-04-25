@@ -66,7 +66,7 @@ int main(){
 
 void Person::getData(){
 
-    cin >> Name >> ID;
+    cin >> this->Name >> this->ID;
 
     return;
 
