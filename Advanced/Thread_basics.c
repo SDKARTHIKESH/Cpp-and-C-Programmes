@@ -22,7 +22,7 @@ void *odd(void *ptr){
 
 	for(int x = 1; x <= 1000; x+=2){
 	
-		printf("%d\n", x);
+		printf("Odd: %d\n", x);
 
 	}
 
@@ -34,7 +34,7 @@ void *even(void *ptr){
 
 	for(int x = 0; x <= 1000; x+=2){
 
-		printf("%d\n", x);
+		printf("Even: %d\n", x);
 
 	}
 

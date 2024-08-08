@@ -13,7 +13,7 @@ int main(){
 
 		if(b == 0){
 			
-			for(int x = 0; x <= 1000; x+=2) printf("%d\n", x);
+			for(int x = 0; x <= 1000; x+=2) printf("Even: %d\n", x);
 
 		}
 		
@@ -22,7 +22,7 @@ int main(){
 
 	else if(a == 0){
 
-		for(int x = 1; x <= 1000; x+=2) printf("%d\n", x);
+		for(int x = 1; x <= 1000; x+=2) printf("Odd: %d\n", x);
 
 	}
 
