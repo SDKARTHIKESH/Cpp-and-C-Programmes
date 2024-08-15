@@ -53,10 +53,7 @@ int main(){
 		res[x][0] = arr[x][0];
 
 		if(x == 0) res[x][1] = arr[x][3];
-		else{
-		       if(res[x-1][1] >= arr[x][1]) res[x][1] = res[x-1][1] + arr[x][3];
-		       else res[x][1] = arr[x][1] + arr[x][3];
-		}
+		else res[x][1] = res[x-1][1] + arr[x][3];
 
 		res[x][2] = res[x][1] - arr[x][1];
 		res[x][3] = res[x][2] - arr[x][3];
