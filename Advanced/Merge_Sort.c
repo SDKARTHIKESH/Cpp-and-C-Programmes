@@ -1,5 +1,4 @@
 #include <stdio.h>
-#include <stdlib.h>
 
 // Merges two subarrays of arr[].
 // First subarray is arr[left..mid]
