@@ -1,108 +1,3 @@
-/*#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-
-struct Employee{
-
-    char Name[50];
-    int Salary;
-
-};
-
-void Insert(struct Employee *Arr, int *Size, char *Name, int Salary);
-void Delete(struct Employee *Arr, int *Size, char *Name);
-
-int main(){
-
-    int Len;
-    scanf("%d", &Len);
-
-    struct Employee *Arr = (struct Employee *)malloc(Len*sizeof(struct Employee));
-
-    for(int x = 0; x < Len; x++){
-        printf("Hello\n");
-        
-        scanf("%s", &(((Arr+x)->Name)[0]));
-        scanf("%d", &((Arr+x)->Salary));
-
-    }
-
-    for(int x = 0; x < Len; x++){
-
-        printf("%s, %d\n", &((Arr+x)->Name)[0], (Arr+x)->Salary);
-
-    }
-
-    char Name[50];
-    int Salary;
-
-    scanf("%s", &Name[0]);
-    scanf("%d", &Salary);
-
-    Insert(Arr, &Len, &Name[0], Salary);
-
-    for(int x = 0; x < Len; x++){
-
-        printf("%s, %d\n", &((Arr+x)->Name)[0], (Arr+x)->Salary);
-
-    }
-
-    scanf("%s", &Name[0]);
-
-    Delete(Arr, &Len, &Name[0]);
-
-    for(int x = 0; x < Len; x++){
-
-        printf("%s, %d\n", &((Arr+x)->Name)[0], (Arr+x)->Salary);
-
-    }
-
-    return 0;
-
-}
-
-void Insert(struct Employee *Arr, int *Size, char *Name, int Salary){
-
-    Arr = (struct Employee *)realloc(Arr, ++(*Size));
-
-    int Index = 2;
-    
-    struct Employee New = {*Name, Salary};
-    struct Employee Temp1 = *(Arr+Index);
-    struct Employee Temp2;
-    *(Arr+Index) = New;
-
-    for(int x = Index+1; x < *Size; x++){
-
-        Temp2 = *(Arr + x);
-        *(Arr + x) = Temp1;
-        Temp1 = Temp2;
-
-    }
-
-    return;
-
-}
-
-void Delete(struct Employee *Arr, int *Size, char *Name){
-
-    int Index;
-
-    for(Index = 0; strcmp(&((Arr+Index)->Name)[0], Name) == 0; Index++);
-
-    for(int x = Index+1; Index < *Size; Index++){
-
-        *(Arr + x - 1) = *(Arr + x);
-
-    }
-
-    Arr = (struct Employee *)realloc(Arr, --(*Size));
-
-    return;
-
-}*/
-
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -115,6 +10,7 @@ typedef struct {
     int V;
     int **capacity, **flow;
     int *height, *excess;
+    omp_lock_t *node_locks;
 } Graph;
 
 Graph* createGraph(int V) {
@@ -128,8 +24,9 @@ Graph* createGraph(int V) {
     g->flow = (int**)malloc(V * sizeof(int*));
     g->height = (int*)calloc(V, sizeof(int));
     g->excess = (int*)calloc(V, sizeof(int));
+    g->node_locks = (omp_lock_t*)malloc(V * sizeof(omp_lock_t));
 
-    if (!g->capacity || !g->flow || !g->height || !g->excess) {
+    if (!g->capacity || !g->flow || !g->height || !g->excess || !g->node_locks) {
         fprintf(stderr, "Memory allocation failed\n");
         exit(1);
     }
@@ -141,6 +38,7 @@ Graph* createGraph(int V) {
             fprintf(stderr, "Memory allocation failed\n");
             exit(1);
         }
+        omp_init_lock(&g->node_locks[i]);
     }
 
     return g;
@@ -151,23 +49,40 @@ void addEdge(Graph* g, int u, int v, int cap) {
 }
 
 void push(Graph* g, int u, int v) {
+    if (u < v) {
+        omp_set_lock(&g->node_locks[u]);
+        omp_set_lock(&g->node_locks[v]);
+    } else {
+        omp_set_lock(&g->node_locks[v]);
+        omp_set_lock(&g->node_locks[u]);
+    }
+
     int flow = MIN(g->excess[u], g->capacity[u][v] - g->flow[u][v]);
     g->flow[u][v] += flow;
     g->flow[v][u] -= flow;
     g->excess[u] -= flow;
     g->excess[v] += flow;
+
+    omp_unset_lock(&g->node_locks[v]);
+    omp_unset_lock(&g->node_locks[u]);
 }
 
 void relabel(Graph* g, int u) {
+    omp_set_lock(&g->node_locks[u]);
+
     int min_height = INT_MAX;
     for (int v = 0; v < g->V; v++) {
         if (g->capacity[u][v] - g->flow[u][v] > 0) {
+            omp_set_lock(&g->node_locks[v]);
             min_height = MIN(min_height, g->height[v]);
+            omp_unset_lock(&g->node_locks[v]);
         }
     }
     if (min_height < INT_MAX) {
         g->height[u] = min_height + 1;
     }
+
+    omp_unset_lock(&g->node_locks[u]);
 }
 
 void initPreflow(Graph* g, int source) {
@@ -200,7 +115,10 @@ int pushRelabelMaxFlow(Graph* g, int source, int sink) {
                     for (int v = 0; v < g->V; v++) {
                         if (g->excess[u] > 0 && g->height[u] == g->height[v] + 1 && g->capacity[u][v] - g->flow[u][v] > 0) {
                             push(g, u, v);
-                            if (v != source && v != sink) active[v] = 1;
+                            if (v != source && v != sink) {
+                                #pragma omp atomic write
+                                active[v] = 1;
+                            }
                             work_done = 1;
                         }
                     }
@@ -225,11 +143,13 @@ void freeGraph(Graph* g) {
     for (int i = 0; i < g->V; i++) {
         free(g->capacity[i]);
         free(g->flow[i]);
+        omp_destroy_lock(&g->node_locks[i]);
     }
     free(g->capacity);
     free(g->flow);
     free(g->height);
     free(g->excess);
+    free(g->node_locks);
     free(g);
 }
 
