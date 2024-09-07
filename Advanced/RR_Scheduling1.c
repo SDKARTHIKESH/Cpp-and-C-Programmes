@@ -50,10 +50,21 @@ int main(){
 
     roundRobin(processes, len1, qt, result, &len2);
 
+    for(int x = 0; x < len2 - 1; x++){
+        for(int y = 0; y < len2 - x - 1; y++){
+            if(result[y].pid > result[y + 1].pid){
+                Output temp = result[y];
+                result[y] = result[y + 1];
+                result[y + 1] = temp;
+            }
+        }
+    }
+
     printf("\nPID | CT | TAT | WT\n");
-    for(int x = 0; x < len2; x++) {
+    for(int x = 0; x < len2; x++)
         printf("P%d | %d | %d | %d\n", result[x].pid, result[x].ct, result[x].tat, result[x].wt);
-}
+
+    return 0;
 
 }
 
