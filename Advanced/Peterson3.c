@@ -41,7 +41,7 @@ void *printNum(void *s){
 
     lock(other);
 
-    for(int x = 1; x <= 10000; x++)
+    for(int x = 1; x <= 100000; x++)
         printf("%d ", x);
 
     unlock(other);

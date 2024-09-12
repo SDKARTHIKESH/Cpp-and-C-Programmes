@@ -4,6 +4,7 @@
 
 int flag[2];
 int turn;
+int number = 0;
 
 void lock_init(){
     flag[0] = flag[1] = 0;
@@ -22,27 +23,31 @@ void unlock(int other){
     flag[other] = 0;
 }
 
-void *printA(void *s){
+void *increment(void *s){
 
+    int x = 0;
+    int a;
     int other = *((int *)s);
 
     lock(other);
 
-    for(int x = 0; x < 10000; x++)
-        printf("A ");
+    number++;
+    printf("Now the Number is: %d\n", number);
 
     unlock(other);
 
 }
 
-void *printNum(void *s){
+void *decrement(void *s){
 
+    int x = 0;
+    int a;
     int other = *((int *)s);
 
     lock(other);
 
-    for(int x = 1; x <= 10000; x++)
-        printf("%d ", x);
+    number--;
+    printf("Now the Number is: %d\n", number);
 
     unlock(other);
 
@@ -51,16 +56,21 @@ void *printNum(void *s){
 int main(){
 
     pthread_t t1, t2;
+    number = 1283;
 
     int thread_ids[2] = {0, 1};
 
+    printf("Before Operation: %d\n", number);
+
     lock_init();
 
-    pthread_create(&t1, NULL, printA, &thread_ids[0]);
-    pthread_create(&t2, NULL, printNum, &thread_ids[1]);
+    pthread_create(&t1, NULL, increment, &thread_ids[0]);
+    pthread_create(&t2, NULL, decrement, &thread_ids[1]);
 
     pthread_join(t1, NULL);
     pthread_join(t2, NULL);
+
+    printf("Final Result: %d\n", number);
 
     return 0;
 
