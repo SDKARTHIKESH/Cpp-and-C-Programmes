@@ -2,8 +2,8 @@
 #include <stdlib.h>
 
 int compare(int arr1[], int arr2[], int n);
-void add(int arr1[], int arr2[], int m);
-void sub(int arr1[], int arr2[], int m);
+void add(int arr1[], int arr2[], int n);
+void print(int arr[], int n);
 
 int main() {
     int n, m;
@@ -24,28 +24,6 @@ int main() {
     }
     for(int x = 0; x < m; x++) {
         scanf("%d", &available[x]);
-    }
-
-    int r;
-    scanf("%d", &r);
-
-    int request[r][m];
-    int pid[r];
-    for(int x = 0; x < r; x++) {
-        scanf("%d", &pid[x]);
-        for(int y = 0; y < m; y++) {
-            scanf("%d", &request[x][y]);
-        }
-    }
-
-    for(int x = 0; x < r; x++) {
-        if(compare(request[x], need[pid[x]], m) && compare(request[x], available, m)) {
-            sub(available, request[x], m);
-            add(allocation[pid[x]], request[x], m);
-            sub(need[pid[x]], request[x], m);
-        } else {
-            printf("The resources requested by P%d are not available\n", pid[x]);
-        }
     }
 
     int is_breaked = 0;
@@ -91,11 +69,5 @@ int compare(int arr1[], int arr2[], int m) {
 void add(int arr1[], int arr2[], int m) {
     for(int x = 0; x < m; x++) {
         arr1[x] += arr2[x];
-    }
-}
-
-void sub(int arr1[], int arr2[], int m) {
-    for(int x = 0; x < m; x++) {
-        arr1[x] -= arr2[x];
     }
 }
