@@ -116,7 +116,7 @@ int pushRelabelMaxFlow(Graph* g, int source, int sink) {
                         if (g->excess[u] > 0 && g->height[u] == g->height[v] + 1 && g->capacity[u][v] - g->flow[u][v] > 0) {
                             push(g, u, v);
                             if (v != source && v != sink) {
-                                #pragma omp atomic write
+                                
                                 active[v] = 1;
                             }
                             work_done = 1;
